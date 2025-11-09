@@ -4,7 +4,7 @@
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(921600); 
   delay(100);
 
   // WiFi
@@ -24,7 +24,7 @@ void setup()
 
   debutAttente = millis();
 
-  Serial.println("timestamp,capteurA,capteurB,PIR,entrer,sortie");
+  Serial.println("timestamp,capteurA,capteurB,PIR,event");
 }
 
 void loop()
@@ -59,9 +59,12 @@ void loop()
   Serial.print(",");
   Serial.print(digitalRead(PIR));
   Serial.print(",");
-  Serial.print(entrer);
-  Serial.print(",");
-  Serial.println(sortie);
+  if (entrer)
+    Serial.println("entrer");
+  else if (sortie)
+    Serial.println("sortie");
+  else 
+    Serial.println("rien");
 
   // Afficher nbr de personnes
   // Serial.print("Nombre personne : ");

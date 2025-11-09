@@ -125,8 +125,8 @@ void compterPeople()
     // Pour entrer
     else if (isCouper == 'A')
     {
-        // Annuler si duree trop long
-        if (millis() - debutAttente > dureeAttente)
+        // Annuler si duree trop long ou capteur A couper de nouveau
+        if (millis() - debutAttente > dureeAttente || isCouperBreakBeamA())
         {
             isCouper = 'N';
         }
@@ -144,8 +144,8 @@ void compterPeople()
     // Pour sortie
     else if (isCouper == 'B')
     {
-        // Annuler si duree trop long
-        if (millis() - debutAttente > dureeAttente)
+        // Annuler si duree trop long ou capteur B couper de nouveau
+        if (millis() - debutAttente > dureeAttente || isCouperBreakBeamB())
         {
             isCouper = 'N';
         }
