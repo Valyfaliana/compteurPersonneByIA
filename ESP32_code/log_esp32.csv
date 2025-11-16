@@ -1,4 +1,4 @@
-timestamp,capteurA,capteurB,PIR,event
+timestamp,capteurA,capteurB,PIR,label
 2448371,1,1,0,rien
 2448783,1,1,0,rien
 2448989,1,1,0,rien
@@ -114,7 +114,6 @@ timestamp,capteurA,capteurB,PIR,event
 2473673,1,1,1,rien
 2473879,1,1,1,rien
 2474085,1,1,1,rien
-474291,1,1,1,rien
 2474496,1,1,1,rien
 2474701,1,1,1,rien
 2474906,1,1,1,rien
@@ -152,7 +151,6 @@ timestamp,capteurA,capteurB,PIR,event
 2482522,1,1,1,rien
 2482728,1,0,1,entrer
 2482934,1,1,1,rien
-483140,1,1,1,rien
 2483346,1,1,1,rien
 2483552,1,1,1,rien
 2483758,1,1,1,rien
