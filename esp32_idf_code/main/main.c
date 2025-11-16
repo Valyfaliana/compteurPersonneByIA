@@ -9,10 +9,10 @@ void app_main(void)
 {
     gpio_set_direction(CAPTEUR, GPIO_MODE_INPUT);
 
-    while(1)
+    while(1) 
     {
         int val = gpio_get_level(CAPTEUR);
         printf("Valeur : %d\n", val);
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
     }
 }
