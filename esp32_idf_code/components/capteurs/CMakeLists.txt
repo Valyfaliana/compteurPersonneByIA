@@ -1,0 +1,1 @@
+idf_component_register(SRCS "capteurs_utils.c" INCLUDE_DIRS "." REQUIRES driver esp_timer)

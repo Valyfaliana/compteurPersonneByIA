@@ -3,16 +3,16 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
-#define CAPTEUR GPIO_NUM_2
+#include "capteurs_utils.h"
+#include "network_utils.h"
 
 void app_main(void)
 {
-    gpio_set_direction(CAPTEUR, GPIO_MODE_INPUT);
-
-    while(1) 
+    wifi_init_sta();
+    
+    while (1)
     {
-        int val = gpio_get_level(CAPTEUR);
-        printf("Valeur : %d\n", val);
+        afficherValeurCapteur(BREAK_BEAM_A);
         vTaskDelay(200 / portTICK_PERIOD_MS);
     }
 }

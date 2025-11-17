@@ -1,0 +1,1 @@
+idf_component_register(SRCS "network_utils.c" INCLUDE_DIRS "." REQUIRES nvs_flash esp_wifi esp_netif)
