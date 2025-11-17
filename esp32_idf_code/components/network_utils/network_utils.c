@@ -7,18 +7,25 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "mqtt_client.h"
 
 // Tes identifiants WiFi
 #define WIFI_SSID "iPhoneValy"
 #define WIFI_PASS "jiml3712"
 #define MAX_RETRY 5
 
-static const char *TAG = "WiFi";
+static const char *TAG = "Wifi lesy e";
 static EventGroupHandle_t wifi_event_group;
 static int retry_num = 0;
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
+
+// Pour la connexion mqtt
+#define MQTT_BROKER "mqtt://172.20.10.8"
+#define MQTT_PORT 1883
+static esp_mqtt_client_handle_t mqtt_client = NULL;
+#define MQTT_CONNECTED_BIT BIT2
 
 // Handler des événements WiFi
 static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
@@ -54,14 +61,15 @@ void wifi_init_sta(void)
 {
     // Init NVS (nécessaire pour le WiFi)
     esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
 
     ESP_LOGI(TAG, "Démarrage de la connexion WiFi...");
-    
+
     wifi_event_group = xEventGroupCreate();
 
     // Init TCP/IP stack
@@ -107,22 +115,62 @@ void wifi_init_sta(void)
     }
 }
 
-// void reconnect()
-// {
-//     while (!client.connected())
-//     {
-//         Serial.print("Attempting MQTT connection...");
-//         if (client.connect("ESP32Client"))
-//         {
-//             Serial.println("connected");
-//             // client.subscribe("test/topic");
-//         }
-//         else
-//         {
-//             Serial.print("failed, rc=");
-//             Serial.print(client.state());
-//             Serial.println(" try again in 5 seconds");
-//             delay(5000);
-//         }
-//     }
-// }
+// Handler des événements MQTT
+static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
+{
+    esp_mqtt_event_handle_t event = event_data;
+
+    switch ((esp_mqtt_event_id_t)event_id)
+    {
+    case MQTT_EVENT_CONNECTED:
+        ESP_LOGI(TAG, "MQTT connecté au broker");
+        xEventGroupSetBits(wifi_event_group, MQTT_CONNECTED_BIT);
+        break;
+
+    case MQTT_EVENT_DISCONNECTED:
+        ESP_LOGW(TAG, "MQTT déconnecté");
+        xEventGroupClearBits(wifi_event_group, MQTT_CONNECTED_BIT);
+        break;
+
+    case MQTT_EVENT_PUBLISHED:
+        ESP_LOGI(TAG, "Message publié, msg_id=%d", event->msg_id);
+        break;
+
+    case MQTT_EVENT_ERROR:
+        ESP_LOGE(TAG, "Erreur MQTT");
+        break;
+
+    default:
+        break;
+    }
+}
+
+void mqtt_init(void)
+{
+    const esp_mqtt_client_config_t mqtt_cfg = {
+        .broker.address.uri = MQTT_BROKER,
+        .broker.address.port = MQTT_PORT,
+    };
+
+    mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
+    esp_mqtt_client_register_event(mqtt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
+    esp_mqtt_client_start(mqtt_client);
+
+    ESP_LOGI(TAG, "Client MQTT démarré");
+
+    // Attendre que MQTT soit connecté
+    xEventGroupWaitBits(wifi_event_group, MQTT_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
+}
+
+void mqtt_publish_data(char *topic, char *data)
+{
+    if (mqtt_client != NULL)
+    {
+        int msg_id = esp_mqtt_client_publish(mqtt_client, topic, data, 0, 1, 0);
+        // ESP_LOGI(TAG, "Envoi sur %s: %s (msg_id=%d)", MQTT_TOPIC, data, msg_id);
+    }
+    else
+    {
+        ESP_LOGE(TAG, "Client MQTT non initialisé");
+    }
+}
