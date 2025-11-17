@@ -72,6 +72,10 @@ void compterPeople()
 {
     if (isCouper == 'N')
     {
+        // initialiser les flags
+        entrer = 0;
+        sortie = 0;
+        
         if (isCouperBreakBeamA())
         {
             isCouper = 'A';

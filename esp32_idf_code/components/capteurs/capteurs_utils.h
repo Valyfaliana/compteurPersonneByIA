@@ -1,9 +1,5 @@
 #pragma once
 
-#define BP103A 34
-#define BP103B 35
-#define SEUIL 3500
-
 #define BREAK_BEAM_A 18
 #define BREAK_BEAM_B 19
 #define PIR 4
@@ -26,4 +22,5 @@ extern int sortie;
 // les fonctions
 void afficherValeurCapteur(int);
 float intensiteLumineux(int);
-void compterPeople();
+void compterPeople(void);
+uint64_t millis(void);
