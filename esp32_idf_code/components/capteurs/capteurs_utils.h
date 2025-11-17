@@ -1,8 +1,10 @@
 #pragma once
 
-#define BREAK_BEAM_A 18
-#define BREAK_BEAM_B 19
-#define PIR 4
+#include "driver/gpio.h"
+
+#define BREAK_BEAM_A GPIO_NUM_18
+#define BREAK_BEAM_B GPIO_NUM_19
+#define PIR GPIO_NUM_4
 
 extern int people;
 

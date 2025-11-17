@@ -144,7 +144,7 @@ const ei_impulse_t impulse_818072_2 = {
     .project_name = "comptagePersonne",
     .impulse_id = 2,
     .impulse_name = "Impulse #2",
-    .deploy_version = 1,
+    .deploy_version = 3,
 
     .nn_input_frame_size = 3,
     .raw_sample_count = 7,

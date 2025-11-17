@@ -166,7 +166,7 @@ void mqtt_publish_data(char *topic, char *data)
 {
     if (mqtt_client != NULL)
     {
-        int msg_id = esp_mqtt_client_publish(mqtt_client, topic, data, 0, 1, 0);
+        esp_mqtt_client_publish(mqtt_client, topic, data, 0, 1, 0);
         // ESP_LOGI(TAG, "Envoi sur %s: %s (msg_id=%d)", MQTT_TOPIC, data, msg_id);
     }
     else
