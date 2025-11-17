@@ -6,6 +6,7 @@
 
 #include "capteurs_utils.h"
 #include "network_utils.h"
+#include "edge-impulse-sdk/classifier/ei_run_classifier_c.h"
 
 void app_main(void)
 {
