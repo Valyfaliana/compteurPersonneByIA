@@ -11,11 +11,11 @@ void app_main(void)
 {
     wifi_init_sta();
     mqtt_init();
-    
+
     while (1)
     {
         compterPeople();
-        
+
         uint64_t timestamp = millis();
         char *valA = gpio_get_level(BREAK_BEAM_A) == 1 ? "1" : "0";
         char *valB = gpio_get_level(BREAK_BEAM_B) == 1 ? "1" : "0";
@@ -30,9 +30,9 @@ void app_main(void)
             sprintf(output, "sortie");
         else
             sprintf(output, "rien");
-        
+
         // affichage sur monitor serial
-        printf("%"PRIu64", %s, %s, %s, %s\n", timestamp, valA, valB, valPir, output);
+        printf("%" PRIu64 ", %s, %s, %s, %s\n", timestamp, valA, valB, valPir, output);
 
         // publication via mqtt
         mqtt_publish_data("nombre/personnes", nbrPeople);
