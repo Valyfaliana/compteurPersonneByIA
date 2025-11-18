@@ -36,9 +36,6 @@ extern "C" void app_main(void)
 
     while (1)
     {
-        // buffer d'entrer
-        // float features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE];
-
         // collection des donnee
         for (int i=0 ; i < EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE ; i += 3)
         {
@@ -49,7 +46,6 @@ extern "C" void app_main(void)
         }
 
         signal_t signal;
-        // numpy::signal_from_buffer(features, EI_CLASSIFIER_RAW_SAMPLE_COUNT, &signal);
         signal.total_length = EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE;
         signal.get_data = &get_signal_data;
 
@@ -65,8 +61,7 @@ extern "C" void app_main(void)
                 printf("  %s: %.5f\n", result.classification[i].label, result.classification[i].value);
             }
         }
-        // printf("prediction : %d \n", EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE);
 
-        vTaskDelay(200 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }

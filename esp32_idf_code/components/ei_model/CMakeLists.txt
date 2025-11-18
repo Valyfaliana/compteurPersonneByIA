@@ -22,7 +22,7 @@ idf_component_register(
         "edge-impulse-sdk/classifier/ei_run_classifier_c.cpp"
         
         # TFLite model
-        "tflite-model/tflite_learn_818072_5_compiled.cpp"
+        "tflite-model/tflite_learn_818072_11_compiled.cpp"
         
         # DSP
         "edge-impulse-sdk/dsp/kissfft/kiss_fft.cpp"
