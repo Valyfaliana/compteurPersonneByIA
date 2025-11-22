@@ -63,7 +63,7 @@ function App() {
   // }, []);
 
   return (
-    <div className="container-lg px-10 bg-gray-900 h-screen flex flex-col items-center overflow-y-auto">
+    <div className="container-lg px-10 bg-gray-900 flex flex-col items-center overflow-y-auto">
       {/* Nombre en temps reel dans la piece */}
       <NbrPeopleLive count={people} size="lg" className="my-12" />
 
@@ -91,7 +91,7 @@ function App() {
             {/* Entrer */}
             <div className="flex items-center w-full mb-4">
               <span className="w-20 text-right mr-2">Entrer : </span>
-              <MyProgressBar value={80} color="green" />&nbsp;80%
+              <MyProgressBar value={75} color="green" />&nbsp;80%
             </div>
             {/* Rien */}
             <div className="flex items-center w-full mb-4">
