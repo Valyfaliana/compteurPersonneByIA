@@ -63,9 +63,11 @@ function App() {
   // }, []);
 
   return (
-    <div className="container-lg px-10 bg-gray-900 flex flex-col items-center overflow-y-auto">
+    <div className="container-lg p-10 bg-gray-900 h-screen flex flex-col items-center overflow-y-auto">
       {/* Nombre en temps reel dans la piece */}
-      <NbrPeopleLive count={people} size="lg" className="my-12" />
+      <div className="mb-10">
+        <NbrPeopleLive count={people} size="lg" />
+      </div>
 
       <div className="flex flex-wrap justify-evenly w-full flex-col flex-row">
         {/* Etat des capteurs break beam */}
@@ -112,8 +114,6 @@ function App() {
 
       {/* Graph de frequentation */}
       <MyGraph />
-
-      <button type="button" onClick={() => setEtatPir(etatPir ? 0 : 1)}>Cliquer</button>
     </div>
   );
 }
