@@ -11,12 +11,12 @@ const GRADIENTS = {
   yellow: "bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-300",
 };
 
-const MyProgressBar = ({ value = 0, color = "blue" }) => {
+const MyProgressBar = ({ value = 0, color = "blue", largeur = "w-full" }) => {
   const gradientClass = GRADIENTS[color] || GRADIENTS.blue;
   const percent = Math.max(0, Math.min(100, value));
 
   return (
-    <div className="w-full h-5 bg-gray-600 rounded-full overflow-hidden shadow-inner">
+    <div className={`${largeur} h-5 bg-gray-600 rounded-full overflow-hidden shadow-inner`}>
       <div
         className={`h-full ${gradientClass} rounded-full transition-all duration-500`}
         style={{ width: `${percent}%` }}

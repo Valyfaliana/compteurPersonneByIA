@@ -19,6 +19,7 @@ const timeScales = [
 ];
 
 function groupEvents(events, scale) {
+    events = [...events].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));// Regroupe les events par échelle de temps
 	// Regroupe les events par échelle de temps
 	const grouped = {};
 	events.forEach(event => {

@@ -15,9 +15,9 @@ const MQTT_TOPIC_PIR = import.meta.env.VITE_TOPIC_PIR;
 
 function App() {
   const [people, setPeople] = useState("14");
-  const [etatBeamA, setEtatBeamA] = useState(0);
-  const [etatBeamB, setEtatBeamB] = useState(0);
-  const [etatPir, setEtatPir] = useState(0);
+  const [etatBeamA, setEtatBeamA] = useState(1);
+  const [etatBeamB, setEtatBeamB] = useState(1);
+  const [etatPir, setEtatPir] = useState(1);
 
   // useEffect(() => {
   //   // Connexion au broker
@@ -70,18 +70,18 @@ function App() {
       <div className="flex flex-wrap justify-evenly w-full flex-col flex-row">
         {/* Etat des capteurs break beam */}
         <MyCard title="Capteur Break Beam" className="w-full md:w-1/4 mb-4 md:mb-0">
-          <div className="flex justify-around">
-            <MyLed value={1} legend='A' />
-            <MyLed value={0} legend='B' />
+          <div className="flex flex-wrap justify-around content-center h-full">
+            <MyLed value={etatBeamA} legend='A' />
+            <MyLed value={etatBeamB} legend='B' />
           </div>
         </MyCard>
 
         {/* Etat capteur PIR */}
         <MyCard 
           title="Capteur PIRs" 
-          className={`w-full md:w-1/4 mb-4 md:mb-0 transition-colors duration-500 ${etatPir && 'bg-gradient-to-br from-green-400 via-green-500 to-green-700'}`}>
-          <span className="text-6xl font-semibold italic">
-            {etatPir ? "Presence" : "Rien"}
+          className={`w-full md:w-1/4 mb-4 md:mb-0 transition-colors duration-500 ${etatPir && 'bg-gradient-to-br from-green-400/50 via-green-500/50 to-green-700/50'}`}>
+          <span className="text-6xl font-semibold italic flex flex-wrap content-center h-full">
+            {etatPir ? "Mouvement" : "Rien"}
           </span>
         </MyCard>
 
@@ -90,18 +90,21 @@ function App() {
           <div className="flex flex-col items-center justify-between w-full">
             {/* Entrer */}
             <div className="flex items-center w-full mb-4">
-              <span className="w-20 text-right mr-2">Entrer : </span>
-              <MyProgressBar value={75} color="green" />&nbsp;80%
+              <span className="w-20 text-right mr-2">Entrer :</span>
+              <MyProgressBar value={75} color="green" largeur="w-11/12" />
+              <span className="w-20">&nbsp;80%</span>
             </div>
             {/* Rien */}
             <div className="flex items-center w-full mb-4">
-              <span className="w-20 text-right mr-2">Rien : </span>
-              <MyProgressBar value={44.3} color="yellow" />&nbsp;44.3%
+              <span className="w-20 text-right mr-2">Rien :</span>
+              <MyProgressBar value={44.3} color="yellow" largeur="w-11/12" />
+              <span className="w-20">&nbsp;44.3%</span>
             </div>
             {/* Sortie */}
             <div className="flex items-center w-full mb-4">
-              <span className="w-20 text-right mr-2">Sortie : </span>
-              <MyProgressBar value={33.2} color="red" />&nbsp;33.2%
+              <span className="w-20 text-right mr-2">Sortie :</span>
+              <MyProgressBar value={33.2} color="red" largeur="w-11/12" />
+              <span className="w-20">&nbsp;33.2%</span>
             </div>
           </div>
         </MyCard>
