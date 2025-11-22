@@ -3,83 +3,109 @@ import NbrPeopleLive from "./components/NbrPeopleLive";
 import MyCard from "./components/MyCard";
 import { useEffect, useState } from "react";
 import mqtt from "mqtt";
+import MyLed from "./components/MyLed";
+import MyProgressBar from "./components/MyProgressBar.jsx";
 
 const serverBroker = import.meta.env.VITE_SERVER_BROKER;
-const MQTT_TOPIC_NBR_PERSONNE = "nombre/personnes";
-const MQTT_TOPIC_INTENSITE_A = "etat/break/beam/A";
-const MQTT_TOPIC_INTENSITE_B = "etat/break/beam/B";
+const MQTT_TOPIC_NBR_PERSONNE = import.meta.env.VITE_TOPIC_NBR_PERSONNE;
+const MQTT_TOPIC_BREAK_BEAM_A = import.meta.env.VITE_TOPIC_BREAK_BEAM_A;
+const MQTT_TOPIC_BREAK_BEAM_B = import.meta.env.VITE_TOPIC_BREAK_BEAM_B;
+const MQTT_TOPIC_PIR = import.meta.env.VITE_TOPIC_PIR;
 
 function App() {
-  const [people, setPeople] = useState("...");
-  const [intensiteLumA, setIntensiteLumA] = useState(0);
-  const [intensiteLumB, setIntensiteLumB] = useState(0);
+  const [people, setPeople] = useState("14");
+  const [etatBeamA, setEtatBeamA] = useState(0);
+  const [etatBeamB, setEtatBeamB] = useState(0);
+  const [etatPir, setEtatPir] = useState(0);
 
-  useEffect(() => {
-    // Connexion au broker
-    const client = mqtt.connect(`ws://${serverBroker}:9001`);
+  // useEffect(() => {
+  //   // Connexion au broker
+  //   const client = mqtt.connect(`${serverBroker}`);
 
-    // Abonnement au topic
-    client.on("connect", () => {
-      console.log("Connecté au broker MQTT !");
-      client.subscribe(MQTT_TOPIC_NBR_PERSONNE);
-      client.subscribe(MQTT_TOPIC_INTENSITE_A);
-      client.subscribe(MQTT_TOPIC_INTENSITE_B);
-    });
+  //   // Abonnement au topic
+  //   client.on("connect", () => {
+  //     console.log("Connecté au broker MQTT !");
+  //     client.subscribe(MQTT_TOPIC_NBR_PERSONNE);
+  //     client.subscribe(MQTT_TOPIC_BREAK_BEAM_A);
+  //     client.subscribe(MQTT_TOPIC_BREAK_BEAM_B);
+  //     client.subscribe(MQTT_TOPIC_PIR);
+  //   });
 
-    // Reception des messages
-    client.on("message", (topic, message) => {
-      switch (topic) {
-        case MQTT_TOPIC_NBR_PERSONNE:
-          setPeople(message.toString());
-          break;
-        case MQTT_TOPIC_INTENSITE_A:
-          setIntensiteLumA(message.toString());
-          break;
-        case MQTT_TOPIC_INTENSITE_B:
-          setIntensiteLumB(message.toString());
-          break;
-        default:
-          break;
-      }
-    });
+  //   // Reception des messages
+  //   client.on("message", (topic, message) => {
+  //     switch (topic) {
+  //       case MQTT_TOPIC_NBR_PERSONNE:
+  //         setPeople(message.toString());
+  //         break;
+  //       case MQTT_TOPIC_BREAK_BEAM_A:
+  //         setEtatBeamA(message.toString());
+  //         break;
+  //       case MQTT_TOPIC_BREAK_BEAM_B:
+  //         setEtatBeamB(message.toString());
+  //         break;
+  //       case MQTT_TOPIC_PIR:
+  //         setEtatPir(message.toString());
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //   });
 
-    // Gestion des erreurs
-    client.on("error", (err) => {
-      console.error("Erreur MQTT:", err);
-    });
+  //   // Gestion des erreurs
+  //   client.on("error", (err) => {
+  //     console.error("Erreur MQTT:", err);
+  //   });
 
-    return () => {
-      client.end();
-    };
-  }, []);
+  //   return () => {
+  //     client.end();
+  //   };
+  // }, []);
 
   return (
-    <div className="px-10 bg-gray-900 w-screen h-screen flex flex-col items-center">
-      {/* Nombre de personnes en temps reel */}
-      <MyCard className="flex flex-col items-center p-8 mt-4 w-full">
-        <span className="text-3xl font-semibold tracking-tight mb-3">
-          Nombre de personnes
-        </span>
-        <NbrPeopleLive count={people} size="lg" />
-      </MyCard>
+    <div className="container-lg px-10 bg-gray-900 h-screen flex flex-col items-center overflow-y-auto">
+      <NbrPeopleLive count={people} size="lg" className="my-12" />
 
-      {/* Intensite lumineux capteurs */}
-      <div className="flex justify-between mt-4 w-full">
-        {/* Capteur A */}
-        <MyCard className="w-full mr-1 bg-linear-to-br from-blue-600 via-blue-700 to-blue-800">
-          <h1 className="text-xl text-gray-300 mb-4">Capteur A</h1>
-          <span className="text-5xl font-semibold">
-            {intensiteLumA} <small className="text-sm">lux.</small>
+      <div className="flex flex-wrap justify-evenly w-full flex-col md:flex-row">
+        {/* Etat des capteurs break beam */}
+        <MyCard title="Capteur Break Beam" className="w-full md:w-1/4 mb-4 md:mb-0">
+          <div className="flex justify-around">
+            <MyLed value={1} legend='A' />
+            <MyLed value={0} legend='B' />
+          </div>
+        </MyCard>
+
+        {/* Etat capteur PIR */}
+        <MyCard 
+          title="Capteur PIRs" 
+          className={`w-full md:w-1/4 mb-4 md:mb-0 transition-colors duration-500 ${etatPir && 'bg-gradient-to-br from-green-400 via-green-500 to-green-700'}`}>
+          <span className="text-6xl font-semibold italic">
+            {etatPir ? "Presence" : "Rien"}
           </span>
         </MyCard>
-        {/* Capteur B */}
-        <MyCard className="w-full ml-1 bg-linear-to-br from-blue-600 via-blue-700 to-blue-800">
-          <h1 className="text-xl text-gray-300 mb-4">Capteur B</h1>
-          <span className="text-5xl font-semibold">
-            {intensiteLumB} <small className="text-sm">lux.</small>
-          </span>
+
+        {/* Probabilite IA */}
+        <MyCard title="Probabilite IA" className="w-full md:w-1/4">
+          <div className="flex flex-col items-center justify-between w-full">
+            {/* Entrer */}
+            <div className="flex items-center w-full mb-4">
+              <span className="w-20 text-right mr-2">Entrer : </span>
+              <MyProgressBar value={80} color="green" />&nbsp;80%
+            </div>
+            {/* Rien */}
+            <div className="flex items-center w-full mb-4">
+              <span className="w-20 text-right mr-2">Rien : </span>
+              <MyProgressBar value={44.3} color="yellow" />&nbsp;44.3%
+            </div>
+            {/* Sortie */}
+            <div className="flex items-center w-full mb-4">
+              <span className="w-20 text-right mr-2">Sortie : </span>
+              <MyProgressBar value={33.2} color="red" />&nbsp;33.2%
+            </div>
+          </div>
         </MyCard>
       </div>
+
+      <button type="button" onClick={() => setEtatPir(etatPir ? 0 : 1)}>Cliquer</button>
     </div>
   );
 }
