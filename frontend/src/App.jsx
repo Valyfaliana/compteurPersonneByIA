@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import mqtt from "mqtt";
 import MyLed from "./components/MyLed";
 import MyProgressBar from "./components/MyProgressBar.jsx";
+import MyGraph from "./components/MyGraph.jsx";
 
 const serverBroker = import.meta.env.VITE_SERVER_BROKER;
 const MQTT_TOPIC_NBR_PERSONNE = import.meta.env.VITE_TOPIC_NBR_PERSONNE;
@@ -63,9 +64,10 @@ function App() {
 
   return (
     <div className="container-lg px-10 bg-gray-900 h-screen flex flex-col items-center overflow-y-auto">
+      {/* Nombre en temps reel dans la piece */}
       <NbrPeopleLive count={people} size="lg" className="my-12" />
 
-      <div className="flex flex-wrap justify-evenly w-full flex-col md:flex-row">
+      <div className="flex flex-wrap justify-evenly w-full flex-col flex-row">
         {/* Etat des capteurs break beam */}
         <MyCard title="Capteur Break Beam" className="w-full md:w-1/4 mb-4 md:mb-0">
           <div className="flex justify-around">
@@ -104,6 +106,9 @@ function App() {
           </div>
         </MyCard>
       </div>
+
+      {/* Graph de frequentation */}
+      <MyGraph />
 
       <button type="button" onClick={() => setEtatPir(etatPir ? 0 : 1)}>Cliquer</button>
     </div>
