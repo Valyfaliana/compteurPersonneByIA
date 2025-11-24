@@ -59,9 +59,19 @@ extern "C" void app_main(void)
         // collection des donnee
         for (int i=0 ; i < EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE ; i += 3)
         {
-            features[i] = (float) gpio_get_level(BREAK_BEAM_A);
-            features[i + 1] = (float) gpio_get_level(BREAK_BEAM_B);
-            features[i + 2] = (float) lecture_pir();
+            int beamA = gpio_get_level(BREAK_BEAM_A);
+            int beamB = gpio_get_level(BREAK_BEAM_B);
+            int pir = lecture_pir();
+            
+            features[i] = (float) beamA;
+            features[i + 1] = (float) beamB;
+            features[i + 2] = (float) pir;
+
+            // envoye msg via mqtt
+            char msg[50];
+            sprintf(msg, "{\"beamA\":%d,\"beamB\":%d,\"pir\":%d}", beamA, beamB, pir);
+            mqtt_publish_data("valeurs/capteurs", msg);
+            
             vTaskDelay(50 / portTICK_PERIOD_MS);
         }
 
@@ -87,6 +97,11 @@ extern "C" void app_main(void)
             float entrer = result.classification[0].value;
             float rien = result.classification[1].value;
             float sortie = result.classification[2].value;
+
+            // publication mqtt
+            char msg[60];
+            sprintf(msg, "{\"entree\":%f,\"rien\":%f,\"sortie\":%f}", entrer, rien, sortie);
+            mqtt_publish_data("ia/probabiliter", msg);
 
             printf("Evenement : %s\n", deduction_probabiliste(entrer, rien, sortie));
         }
