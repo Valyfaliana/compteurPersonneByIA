@@ -4,30 +4,30 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
-// #include "model-parameters/model_metadata.h"
-// #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
+#include "model-parameters/model_metadata.h"
+#include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 
 extern "C"
 {
 #include "capteurs_utils.h"
-    // #include "network_utils.h"
+#include "network_utils.h"
 }
 
 // #define BREAK_BEAM_A GPIO_NUM_18
 // #define BREAK_BEAM_B GPIO_NUM_19
 // #define PIR GPIO_NUM_4
 
-// static float features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE];
+static float features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE];
 
-// // Callback: fill a section of the out_ptr buffer when requested
-// static int get_signal_data(size_t offset, size_t length, float *out_ptr)
-// {
-//     for (size_t i = 0; i < length; i++)
-//     {
-//         out_ptr[i] = (features + offset)[i];
-//     }
-//     return EIDSP_OK;
-// }
+// Callback: fill a section of the out_ptr buffer when requested
+static int get_signal_data(size_t offset, size_t length, float *out_ptr)
+{
+    for (size_t i = 0; i < length; i++)
+    {
+        out_ptr[i] = (features + offset)[i];
+    }
+    return EIDSP_OK;
+}
 
 char* deduction_probabiliste(float entrer, float rien, float sortie)
 {
@@ -51,8 +51,8 @@ char* deduction_probabiliste(float entrer, float rien, float sortie)
 
 extern "C" void app_main(void)
 {
-    // wifi_init_sta();
-    // mqtt_init();
+    wifi_init_sta();
+    mqtt_init();
 
     while (1)
     {
@@ -61,8 +61,8 @@ extern "C" void app_main(void)
         {
             features[i] = (float) gpio_get_level(BREAK_BEAM_A);
             features[i + 1] = (float) gpio_get_level(BREAK_BEAM_B);
-            features[i + 2] = (float) is_pir_active(PIR1, PIR2);
-            vTaskDelay(200 / portTICK_PERIOD_MS);
+            features[i + 2] = (float) lecture_pir();
+            vTaskDelay(50 / portTICK_PERIOD_MS);
         }
 
         signal_t signal;
@@ -91,25 +91,25 @@ extern "C" void app_main(void)
             printf("Evenement : %s\n", deduction_probabiliste(entrer, rien, sortie));
         }
 
-        compterPeople();
+        // compterPeople();
 
-        uint64_t timestamp = millis();
-        int valA = gpio_get_level(BREAK_BEAM_A);
-        int valB = gpio_get_level(BREAK_BEAM_B);
-        int valPir = gpio_get_level(PIR);
-        char output[10];
-        char nbrPeople[5]; // max: 9999 personnes
-        sprintf(nbrPeople, "%d", people);
+        // uint64_t timestamp = millis();
+        // int valA = gpio_get_level(BREAK_BEAM_A);
+        // int valB = gpio_get_level(BREAK_BEAM_B);
+        // int valPir = lecture_pir();
+        // char output[10];
+        // char nbrPeople[5]; // max: 9999 personnes
+        // sprintf(nbrPeople, "%d", people);
 
-        if (entrer)
-            sprintf(output, "entrer");
-        else if (sortie)
-            sprintf(output, "sortie");
-        else
-            sprintf(output, "rien");
+        // if (entrer)
+        //     sprintf(output, "entrer");
+        // else if (sortie)
+        //     sprintf(output, "sortie");
+        // else
+        //     sprintf(output, "rien");
 
-        // affichage sur monitor serial
-        printf("%" PRIu64 ", %d, %d, %d, %s\n", timestamp, valA, valB, valPir, output);
+        // // affichage sur monitor serial
+        // printf("%" PRIu64 ", %d, %d, %d, %s\n", timestamp, valA, valB, valPir, output);
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }

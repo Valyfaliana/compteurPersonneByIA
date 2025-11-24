@@ -4,7 +4,8 @@
 
 #define BREAK_BEAM_A GPIO_NUM_18
 #define BREAK_BEAM_B GPIO_NUM_19
-#define PIR GPIO_NUM_4
+#define PIR1 GPIO_NUM_4
+#define PIR2 GPIO_NUM_2
 
 extern int people;
 
@@ -26,3 +27,4 @@ void afficherValeurCapteur(int);
 float intensiteLumineux(int);
 void compterPeople(void);
 uint64_t millis(void);
+int lecture_pir(void);

@@ -1,3 +1,4 @@
 {
-    "idf.pythonInstallPath": "/usr/bin/python3"
+    "idf.pythonInstallPath": "/usr/bin/python3",
+    "cmake.sourceDirectory": "/home/valyfaliana/Bureau/memoire L3/compteurPersonneByIA/esp32_idf_code"
 }

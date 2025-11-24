@@ -3,7 +3,7 @@ import React from 'react';
 const sizeMap = {
   sm: 'w-10 h-10 text-sm',
   md: 'w-16 h-16 text-lg',
-  lg: 'w-24 h-24 text-2xl'
+  lg: 'w-30 h-30 text-4xl'
 };
 
 const NbrPeopleLive = ({ count = 0, size = 'md', className = '' }) => {

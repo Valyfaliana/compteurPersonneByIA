@@ -99,7 +99,7 @@ void compterPeople()
         }
         else
         {
-            if (isCouperBreakBeamB() && gpio_get_level(PIR) == 1)
+            if (isCouperBreakBeamB() && lecture_pir() == 1)
             {
                 isCouper = 'N';
                 people++;
@@ -118,7 +118,7 @@ void compterPeople()
         }
         else
         {
-            if (isCouperBreakBeamA() && gpio_get_level(PIR) == 1)
+            if (isCouperBreakBeamA() && lecture_pir() == 1)
             {
                 isCouper = 'N';
                 if (people > 0) {
@@ -129,6 +129,13 @@ void compterPeople()
             }
         }
     }
+}
+
+int lecture_pir() {
+    if (gpio_get_level(PIR1) || gpio_get_level(PIR2))
+        return 1;
+    else 
+        return 0;
 }
 
 uint64_t millis()
