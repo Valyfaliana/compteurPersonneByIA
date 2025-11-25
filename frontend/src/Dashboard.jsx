@@ -28,7 +28,7 @@ const Dashboard = () => {
       {/* Bouton de déconnexion */}
       <button
         onClick={handleLogout}
-        className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
+        className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600/0 to-red-700/0 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
         title="Déconnexion"
       >
         <LogOut className="w-5 h-5" />
@@ -48,7 +48,7 @@ const PartieTempsReel = () => {
   const [people, setPeople] = useState("14");
 
   // Etat capteurs
-  const [etatBeamA, setEtatBeamA] = useState(1);
+  const [etatBeamA, setEtatBeamA] = useState(0);
   const [etatBeamB, setEtatBeamB] = useState(1);
   const [etatPir, setEtatPir] = useState(1);
 
@@ -127,7 +127,7 @@ const PartieTempsReel = () => {
           title="Capteur PIRs"
           className={`w-full md:w-1/4 mb-4 md:mb-0 transition-colors duration-500 ${
             etatPir &&
-            "bg-gradient-to-br from-blue-400/50 via-blue-500/50 to-blue-700/50"
+            "bg-gradient-to-br from-blue-400/70 via-blue-500/70 to-blue-700/70"
           }`}
         >
           <span className="text-6xl font-semibold italic flex flex-wrap content-center h-full">
