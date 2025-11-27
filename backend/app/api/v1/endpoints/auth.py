@@ -47,7 +47,7 @@ def login_user(credentials: LoginRequest, db: Session = Depends(database.get_db)
         )
     
     # Vérifier le mot de passe
-    if not verify_password(credentials.password, user.hashed_password):
+    if not verify_password(credentials.password, user.hashed_password): # type: ignore
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect.",
@@ -57,11 +57,11 @@ def login_user(credentials: LoginRequest, db: Session = Depends(database.get_db)
     access_token = f"token_{user.id}_{user.email}"
     
     return LoginResponse(
-        id=user.id,
-        email=user.email,
-        nom=user.nom,
-        prenoms=user.prenoms,
-        created_at=user.created_at,
+        id=user.id, # type: ignore
+        email=user.email, # type: ignore
+        nom=user.nom, # type: ignore
+        prenoms=user.prenoms, # type: ignore
+        created_at=user.created_at, # type: ignore
         access_token=access_token,
         token_type="bearer",
     )

@@ -7,6 +7,7 @@ import MyProgressBar from "./components/MyProgressBar";
 import NbrPeopleLive from "./components/NbrPeopleLive";
 import { useNavigate } from "react-router-dom";
 import mqtt from "mqtt";
+import { useAuth } from "./utils/hooks/AuthProvider";
 
 const serverBroker = import.meta.env.VITE_SERVER_BROKER;
 const MQTT_TOPIC_NBR_PERSONNE = import.meta.env.VITE_TOPIC_NBR_PERSONNE;
@@ -15,27 +16,27 @@ const MQTT_TOPIC_IA = import.meta.env.VITE_TOPIC_IA;
 
 const Dashboard = () => {
   const nav = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
     console.log("Déconnexion...");
-    // Ajouter votre logique de déconnexion ici
-    // Par exemple : clearAuthToken(), redirect to login, etc.
+    logout();
     nav("/");
   };
 
   return (
     <div className="container-lg p-10 bg-gray-900 h-screen flex flex-col items-center overflow-y-auto relative">
       {/* Bouton de déconnexion */}
-      <button
-        onClick={handleLogout}
-        className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600/0 to-red-700/0 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
-        title="Déconnexion"
-      >
-        <LogOut className="w-5 h-5" />
-        <span className="hidden sm:inline">Déconnexion</span>
-      </button>
+        <button
+          onClick={handleLogout}
+          className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-transparent hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-200 hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
+          title="Déconnexion re olona"
+        >
+          <LogOut className="w-5 h-5" />
+          <span className="hidden sm:inline">Déconnexion</span>
+        </button>
 
-      {/* Data temps reel */}
+        {/* Data temps reel */}
       <PartieTempsReel />
       
       {/* Graph de frequentation */}
@@ -45,10 +46,10 @@ const Dashboard = () => {
 };
 
 const PartieTempsReel = () => {
-  const [people, setPeople] = useState("14");
+  const [people, setPeople] = useState("0");
 
   // Etat capteurs
-  const [etatBeamA, setEtatBeamA] = useState(0);
+  const [etatBeamA, setEtatBeamA] = useState(1);
   const [etatBeamB, setEtatBeamB] = useState(1);
   const [etatPir, setEtatPir] = useState(1);
 
@@ -65,6 +66,7 @@ const PartieTempsReel = () => {
     client.on("connect", () => {
       console.log("Connecté au broker MQTT !");
       client.subscribe(MQTT_TOPIC_CAPTEURS);
+      client.subscribe(MQTT_TOPIC_NBR_PERSONNE);
       client.subscribe(MQTT_TOPIC_IA);
     });
 

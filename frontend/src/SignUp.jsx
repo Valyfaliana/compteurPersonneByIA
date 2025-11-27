@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, CheckCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { apiSignUp } from './api/auth';
+import { useAuth } from './utils/hooks/AuthProvider';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +19,9 @@ const SignUp = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  const { login } = useAuth();
+  const nav = useNavigate();
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -25,7 +30,7 @@ const SignUp = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess(false);
@@ -68,24 +73,19 @@ const SignUp = () => {
 
     setIsLoading(true);
     // Simulation d'une requête API
-    setTimeout(() => {
-      console.log('SignUp attempt:', { 
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-      });
+    try {
+      const res = await apiSignUp(formData.email, formData.password, formData.lastName, formData.firstName);
+      console.log("Reponse server lors de l'inscription : ", res);
+
+      if (res.status === 201) {
+        login(res.data.email);
+        nav("/dashboard");
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'inscription : ", error);
+      setError(error.response.data.detail);
       setIsLoading(false);
-      setSuccess(true);
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        agreeTerms: false,
-      });
-      setTimeout(() => setSuccess(false), 3000);
-    }, 1500);
+    }
   };
 
   return (

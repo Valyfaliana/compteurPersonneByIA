@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
@@ -8,6 +9,10 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "mqtt_client.h"
+
+#include "esp_log.h"
+#include "esp_err.h"
+#include "esp_http_client.h"
 
 // Tes identifiants WiFi
 #define WIFI_SSID "iPhoneValy"
@@ -173,4 +178,61 @@ void mqtt_publish_data(char *topic, char *data)
     {
         ESP_LOGE(TAG, "Client MQTT non initialisé");
     }
+}
+
+
+static const char *TAG_HTTP = "HTTP_CLIENT";
+
+// Callback pour récupérer la réponse
+esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
+    switch(evt->event_id) {
+        case HTTP_EVENT_ON_DATA:
+            if (evt->data_len) {
+                printf("Recevied: %.*s\n", evt->data_len, (char*)evt->data);
+            }
+            break;
+        default:
+            break;
+    }
+    return ESP_OK;
+}
+
+// void http_get_request() {
+//     esp_http_client_config_t config = {
+//         .url = "http://192.168.1.100:5000/endpoint", // ton serveur
+//         .event_handler = _http_event_handler,
+//     };
+
+//     esp_http_client_handle_t client = esp_http_client_init(&config);
+//     esp_err_t err = esp_http_client_perform(client);
+//     if (err == ESP_OK) {
+//         ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %d",
+//                  esp_http_client_get_status_code(client),
+//                  esp_http_client_get_content_length(client));
+//     } else {
+//         ESP_LOGE(TAG, "HTTP GET request failed: %s", esp_err_to_name(err));
+//     }
+//     esp_http_client_cleanup(client);
+// }
+
+void http_post_request(char* post_data) {
+    esp_http_client_config_t config = {
+        .url = "http://172.20.10.8:8000/api/v1/events",
+        .event_handler = _http_event_handler,
+    };
+    
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    esp_http_client_set_method(client, HTTP_METHOD_POST);
+    esp_http_client_set_post_field(client, post_data, strlen(post_data));
+    esp_http_client_set_header(client, "Content-Type", "application/json");
+
+    esp_err_t err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG_HTTP, "HTTP POST Status = %d, content_length = %d",
+                 esp_http_client_get_status_code(client),
+                 esp_http_client_get_content_length(client));
+    } else {
+        ESP_LOGE(TAG_HTTP, "HTTP POST request failed: %s", esp_err_to_name(err));
+    }
+    esp_http_client_cleanup(client);
 }

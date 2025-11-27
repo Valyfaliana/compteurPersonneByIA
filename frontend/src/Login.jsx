@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { apiLogin } from './api/auth';
+import { useAuth } from './utils/hooks/AuthProvider';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -8,8 +10,11 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { login } = useAuth();
 
-  const handleSubmit = (e) => {
+  const nav = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
@@ -24,12 +29,20 @@ const Login = () => {
     }
 
     setIsLoading(true);
-    // Simulation d'une requête API
-    setTimeout(() => {
-      console.log('Login attempt:', { email, password });
+    // Requête API vers fastapi
+    try {
+      const res = await apiLogin(email, password);
+      console.log("Reponse server pour login : ", res);
+
+      if (res.status === 200) {
+        login(res.data.access_token);
+        nav("/dashboard");
+      }
+    } catch (error) {
+      console.error("Erreur lors de login : ", error);
+      setError(error.response.data.detail);
       setIsLoading(false);
-      // Ici, vous pouvez ajouter la logique d'authentification réelle
-    }, 1500);
+    }
   };
 
   return (

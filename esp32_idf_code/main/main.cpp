@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <inttypes.h>
+#include <cstring>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
@@ -13,9 +14,9 @@ extern "C"
 #include "network_utils.h"
 }
 
-// #define BREAK_BEAM_A GPIO_NUM_18
-// #define BREAK_BEAM_B GPIO_NUM_19
-// #define PIR GPIO_NUM_4
+#define SEUIL_PROBA 0.8
+
+int nbrPeopleIA = 0;
 
 static float features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE];
 
@@ -29,21 +30,21 @@ static int get_signal_data(size_t offset, size_t length, float *out_ptr)
     return EIDSP_OK;
 }
 
-char* deduction_probabiliste(float entrer, float rien, float sortie)
+char *deduction_probabiliste(float entrer, float rien, float sortie)
 {
-    if (entrer > rien && entrer > sortie && entrer > 50.) 
+    if (entrer > rien && entrer > sortie && entrer > SEUIL_PROBA)
     {
         return "entrer";
     }
-    else if (rien > sortie && rien > 50.) 
+    else if (rien > sortie && rien > SEUIL_PROBA)
     {
         return "rien";
     }
-    else if (sortie > 50.)
+    else if (sortie > SEUIL_PROBA)
     {
         return "sortie";
     }
-    else 
+    else
     {
         return "incertain";
     }
@@ -56,23 +57,35 @@ extern "C" void app_main(void)
 
     while (1)
     {
+        char nbrPeople[5]; // max: 9999 personnes
+        char nbrPeopleIAStr[5]; // max: 9999 personnes
+
         // collection des donnee
-        for (int i=0 ; i < EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE ; i += 3)
+        for (int i = 0; i < EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE; i += 3)
         {
+            // Compter les personnes.
+            compterPeople();
+
+            // Envoyer le nombres de personnes presents via mqtt. OOEEE !!!
+            sprintf(nbrPeople, "%d", people);
+            mqtt_publish_data("nombres/personnes", nbrPeople);
+            sprintf(nbrPeopleIAStr, "%d", nbrPeopleIA);
+            mqtt_publish_data("nombres/personnes/IA", nbrPeopleIAStr);
+            
             int beamA = gpio_get_level(BREAK_BEAM_A);
             int beamB = gpio_get_level(BREAK_BEAM_B);
             int pir = lecture_pir();
-            
-            features[i] = (float) beamA;
-            features[i + 1] = (float) beamB;
-            features[i + 2] = (float) pir;
+
+            features[i] = (float)beamA;
+            features[i + 1] = (float)beamB;
+            features[i + 2] = (float)pir;
 
             // envoye msg via mqtt
             char msg[50];
             sprintf(msg, "{\"beamA\":%d,\"beamB\":%d,\"pir\":%d}", beamA, beamB, pir);
             mqtt_publish_data("valeurs/capteurs", msg);
-            
-            vTaskDelay(50 / portTICK_PERIOD_MS);
+
+            vTaskDelay(140 / portTICK_PERIOD_MS);
         }
 
         signal_t signal;
@@ -86,13 +99,6 @@ extern "C" void app_main(void)
         // afficher resultat prediction
         if (res == EI_IMPULSE_OK)
         {
-            // Afficher les résultats
-            printf("Predictions:\n");
-            for (size_t i = 0; i < EI_CLASSIFIER_LABEL_COUNT; i++)
-            {
-                printf("  %s: %.5f\n", result.classification[i].label, result.classification[i].value);
-            }
-
             // 0: entrer - 1: rien - 2: sortie
             float entrer = result.classification[0].value;
             float rien = result.classification[1].value;
@@ -103,18 +109,35 @@ extern "C" void app_main(void)
             sprintf(msg, "{\"entree\":%f,\"rien\":%f,\"sortie\":%f}", entrer, rien, sortie);
             mqtt_publish_data("ia/probabiliter", msg);
 
-            printf("Evenement : %s\n", deduction_probabiliste(entrer, rien, sortie));
+            // publication http post
+            if (strcmp(deduction_probabiliste(entrer, rien, sortie), "entrer") == 0)
+            {
+                char message[60];
+                sprintf(message, "{\"event_type\":\"entree\", \"confidence\": %f}", entrer);
+                nbrPeopleIA++;
+                http_post_request(message);
+            }
+            else if (strcmp(deduction_probabiliste(entrer, rien, sortie), "sortie") == 0)
+            {
+                // char message[60];
+                // sprintf(message, "{\"event_type\":\"sortie\", \"confidence\": %f}", sortie);
+                if (nbrPeopleIA > 0)
+                    nbrPeopleIA--;
+                // http_post_request(message);
+            }
         }
 
-        // compterPeople();
 
         // uint64_t timestamp = millis();
         // int valA = gpio_get_level(BREAK_BEAM_A);
         // int valB = gpio_get_level(BREAK_BEAM_B);
         // int valPir = lecture_pir();
         // char output[10];
-        // char nbrPeople[5]; // max: 9999 personnes
-        // sprintf(nbrPeople, "%d", people);
+
+        // // envoye msg via mqtt
+        // char msg[50];
+        // sprintf(msg, "{\"beamA\":%d,\"beamB\":%d,\"pir\":%d}", valA, valB, valPir);
+        // mqtt_publish_data("valeurs/capteurs", msg);
 
         // if (entrer)
         //     sprintf(output, "entrer");
@@ -126,6 +149,6 @@ extern "C" void app_main(void)
         // // affichage sur monitor serial
         // printf("%" PRIu64 ", %d, %d, %d, %s\n", timestamp, valA, valB, valPir, output);
 
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        // vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
