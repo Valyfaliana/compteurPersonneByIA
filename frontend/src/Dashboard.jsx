@@ -8,6 +8,7 @@ import NbrPeopleLive from "./components/NbrPeopleLive";
 import { useNavigate } from "react-router-dom";
 import mqtt from "mqtt";
 import { useAuth } from "./utils/hooks/AuthProvider";
+import { apiGetEvents } from "./api/events";
 
 const serverBroker = import.meta.env.VITE_SERVER_BROKER;
 const MQTT_TOPIC_NBR_PERSONNE = import.meta.env.VITE_TOPIC_NBR_PERSONNE;
@@ -17,12 +18,20 @@ const MQTT_TOPIC_IA = import.meta.env.VITE_TOPIC_IA;
 const Dashboard = () => {
   const nav = useNavigate();
   const { logout } = useAuth();
+  // Data historique
+  const [historique, setHistorique] = useState([]);
 
   const handleLogout = () => {
     console.log("Déconnexion...");
     logout();
     nav("/");
   };
+
+  useEffect(() => {
+    apiGetEvents()
+      .then(res => setHistorique(res.data))
+      .catch(err => console.error("Erreur recuperation historique : ", err));
+  }, []);
 
   return (
     <div className="container-lg p-10 bg-gray-900 h-screen flex flex-col items-center overflow-y-auto relative">
@@ -40,7 +49,7 @@ const Dashboard = () => {
       <PartieTempsReel />
       
       {/* Graph de frequentation */}
-      <MyGraph />
+      <MyGraph dataProps={historique} />
     </div>
   );
 };
@@ -112,7 +121,7 @@ const PartieTempsReel = () => {
         <NbrPeopleLive count={people} size="lg" />
       </div>
 
-      <div className="flex flex-wrap justify-evenly w-full flex-col flex-row">
+      <div className="flex flex-wrap justify-evenly w-full flex-row">
         {/* Etat des capteurs break beam */}
         <MyCard
           title="Capteur Break Beam"
@@ -129,7 +138,7 @@ const PartieTempsReel = () => {
           title="Capteur PIRs"
           className={`w-full md:w-1/4 mb-4 md:mb-0 transition-colors duration-500 ${
             etatPir &&
-            "bg-gradient-to-br from-blue-400/70 via-blue-500/70 to-blue-700/70"
+            "bg-linear-to-br from-blue-400/70 via-blue-500/70 to-blue-700/70"
           }`}
         >
           <span className="text-6xl font-semibold italic flex flex-wrap content-center h-full">

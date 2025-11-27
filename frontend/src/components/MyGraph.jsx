@@ -10,10 +10,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { AreaChart, Area } from "recharts";
-import { staticEventsData } from "../data/db_statique";
+// import { staticEventsData } from "../data/db_statique";
 
 // Données statiques simulant la table events
-const staticEvents = staticEventsData;
+// const staticEvents = staticEventsData;
 
 const timeScales = [
   { label: "Heure", value: "hour" },
@@ -25,16 +25,22 @@ const timeScales = [
 function groupEvents(events, scale) {
   events = [...events].sort(
     (a, b) => new Date(a.created_at) - new Date(b.created_at)
-  ); // Regroupe les events par échelle de temps
-  // Regroupe les events par échelle de temps
+  );
+  
   const grouped = {};
+  
   events.forEach((event) => {
     let key;
+    let sortKey; // Clé numérique pour le tri
     const date = new Date(event.created_at);
+    
     if (scale === "hour") {
-      key = date.getHours() + ":00";
+      const hours = date.getHours();
+      key = String(hours).padStart(2, "0") + ":00";
+      sortKey = hours;
     } else if (scale === "day") {
       key = date.toISOString().slice(0, 10);
+      sortKey = date.getTime();
     } else if (scale === "week") {
       // ISO week number
       const d = new Date(date.getTime());
@@ -43,12 +49,14 @@ function groupEvents(events, scale) {
       const yearStart = new Date(d.getFullYear(), 0, 1);
       const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
       key = `${d.getFullYear()}-S${weekNo}`;
+      sortKey = d.getTime();
     } else if (scale === "month") {
       key =
         date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
+      sortKey = date.getFullYear() * 12 + date.getMonth();
     }
-    // Initialiser uniquement les types présents dans les données
-    if (!grouped[key])
+    
+    if (!grouped[key]) {
       grouped[key] = {
         count: 0,
         entree: 0,
@@ -56,9 +64,12 @@ function groupEvents(events, scale) {
         rien: 0,
         confidence: 0,
         key,
+        sortKey,
       };
+    }
+    
     grouped[key].count++;
-    if (event.event_type === "entrée")
+    if (event.event_type === "entree")
       grouped[key].entree = (grouped[key].entree || 0) + 1;
     if (event.event_type === "sortie")
       grouped[key].sortie = (grouped[key].sortie || 0) + 1;
@@ -66,16 +77,19 @@ function groupEvents(events, scale) {
       grouped[key].rien = (grouped[key].rien || 0) + 1;
     grouped[key].confidence += event.confidence;
   });
-  // Moyenne de la confiance
-  return Object.values(grouped).map((g) => ({
-    ...g,
-    confidence: g.count ? (g.confidence / g.count).toFixed(2) : 0,
-  }));
+  
+  // Trier par sortKey (numérique) et convertir en array
+  return Object.values(grouped)
+    .sort((a, b) => a.sortKey - b.sortKey)
+    .map((g) => ({
+      ...g,
+      confidence: g.count ? (g.confidence / g.count).toFixed(2) : 0,
+    }));
 }
 
-const MyGraph = () => {
+const MyGraph = ({ dataProps }) => {
   const [scale, setScale] = useState("hour");
-  const data = groupEvents(staticEvents, scale);
+  const data = groupEvents(dataProps, scale);
 
   return (
     <div className="bg-white/9 backdrop-blur-sm w-full md:w-9/12 shadow-xl rounded-xl p-6 mx-auto mt-8">
