@@ -113,16 +113,16 @@ const SignUp = () => {
         {/* Conteneur principal */}
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* En-tête */}
-          <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 px-8 py-12 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white bg-opacity-20 rounded-full mb-4">
-              <User className="w-8 h-8 text-white" />
+          <div className="bg-linear-to-br from-blue-600 via-blue-700 to-blue-800 px-8 py-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4">
+              <User className="w-12 h-12 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Créer un compte</h1>
             <p className="text-blue-100">Rejoignez-nous dès maintenant</p>
           </div>
 
           {/* Formulaire */}
-          <div className="px-8 py-8">
+          <div className="px-8 py-8 bg-gray-50">
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Message d'erreur */}
               {error && (
@@ -270,7 +270,7 @@ const SignUp = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>

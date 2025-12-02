@@ -144,17 +144,17 @@ const ei_impulse_t impulse_818072_4 = {
     .project_name = "comptagePersonne",
     .impulse_id = 4,
     .impulse_name = "Impulse #4",
-    .deploy_version = 5,
+    .deploy_version = 6,
 
     .nn_input_frame_size = 15,
-    .raw_sample_count = 7,
+    .raw_sample_count = 9,
     .raw_samples_per_frame = 3,
-    .dsp_input_frame_size = 7 * 3,
+    .dsp_input_frame_size = 9 * 3,
     .input_width = 0,
     .input_height = 0,
     .input_frames = 0,
-    .interval_ms = 412,
-    .frequency = 2.4271844660194173,
+    .interval_ms = 333.3333333333333,
+    .frequency = 3,
 
     .dsp_blocks_size = ei_dsp_blocks_818072_4_size,
     .dsp_blocks = ei_dsp_blocks_818072_4,
@@ -171,7 +171,7 @@ const ei_impulse_t impulse_818072_4 = {
 
     .sensor = EI_CLASSIFIER_SENSOR_FUSION,
     .fusion_string = "capteurA + capteurB + PIR",
-    .slice_size = (7/4),
+    .slice_size = (9/4),
     .slices_per_model_window = 4,
 
     .has_anomaly = EI_ANOMALY_TYPE_UNKNOWN,
