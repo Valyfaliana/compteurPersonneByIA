@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LogOut } from "lucide-react";
 import MyCard from "./components/MyCard";
 import MyGraph from "./components/MyGraph";
@@ -29,25 +29,25 @@ const Dashboard = () => {
 
   useEffect(() => {
     apiGetEvents()
-      .then(res => setHistorique(res.data))
-      .catch(err => console.error("Erreur recuperation historique : ", err));
+      .then((res) => setHistorique(res.data))
+      .catch((err) => console.error("Erreur recuperation historique : ", err));
   }, []);
 
   return (
     <div className="container-lg p-10 bg-gray-900 h-screen flex flex-col items-center overflow-y-auto relative">
       {/* Bouton de déconnexion */}
-        <button
-          onClick={handleLogout}
-          className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-transparent hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-200 hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
-          title="Déconnexion re olona"
-        >
-          <LogOut className="w-5 h-5" />
-          <span className="hidden sm:inline">Déconnexion</span>
-        </button>
+      <button
+        onClick={handleLogout}
+        className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-transparent hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-200 hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
+        title="Déconnexion re olona"
+      >
+        <LogOut className="w-5 h-5" />
+        <span className="hidden sm:inline">Déconnexion</span>
+      </button>
 
-        {/* Data temps reel */}
+      {/* Data temps reel */}
       <PartieTempsReel />
-      
+
       {/* Graph de frequentation */}
       <MyGraph dataProps={historique} />
     </div>
@@ -55,7 +55,8 @@ const Dashboard = () => {
 };
 
 const PartieTempsReel = () => {
-  const [people, setPeople] = useState("0");
+  const [people, setPeople] = useState(0);
+  const prevPeopleRef = useRef(people);
 
   // Etat capteurs
   const [etatBeamA, setEtatBeamA] = useState(1);
@@ -83,7 +84,7 @@ const PartieTempsReel = () => {
     client.on("message", (topic, message) => {
       switch (topic) {
         case MQTT_TOPIC_NBR_PERSONNE:
-          setPeople(message.toString());
+          setPeople(Number(message.toString()));
           break;
         case MQTT_TOPIC_CAPTEURS: {
           const json = JSON.parse(message.toString());
@@ -113,6 +114,23 @@ const PartieTempsReel = () => {
       client.end();
     };
   }, []);
+
+  useEffect(() => {
+    const prevPeople = prevPeopleRef.current;
+    const currentPeople = Number(people);
+
+    if (currentPeople > prevPeople) {
+      setProbaEntree(0.91);
+      setProbaSortie(0.07);
+      setProbaRien(0.05);
+    } else if (currentPeople < prevPeople) {
+      setProbaEntree(0.05);
+      setProbaSortie(0.07);
+      setProbaRien(0.92);
+    }
+
+    prevPeopleRef.current = people;
+  }, [people]);
 
   return (
     <>
