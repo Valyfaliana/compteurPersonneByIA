@@ -125,8 +125,8 @@ const PartieTempsReel = () => {
       setProbaRien(0.05);
     } else if (currentPeople < prevPeople) {
       setProbaEntree(0.05);
-      setProbaSortie(0.07);
-      setProbaRien(0.92);
+      setProbaRien(0.12);
+      setProbaSortie(0.95);
     }
 
     prevPeopleRef.current = people;

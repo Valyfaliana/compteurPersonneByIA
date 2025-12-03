@@ -80,6 +80,9 @@ const SignUp = () => {
       if (res.status === 201) {
         login(res.data.email);
         nav("/dashboard");
+      } else {
+        console.error("Erreur login : ", res);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de l'inscription : ", error);
