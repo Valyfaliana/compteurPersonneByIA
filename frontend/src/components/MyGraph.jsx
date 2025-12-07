@@ -18,7 +18,6 @@ import { AreaChart, Area } from "recharts";
 const timeScales = [
   { label: "Heure", value: "hour" },
   { label: "Jour", value: "day" },
-  { label: "Semaine", value: "week" },
   { label: "Mois", value: "month" },
 ];
 
@@ -26,36 +25,29 @@ function groupEvents(events, scale) {
   events = [...events].sort(
     (a, b) => new Date(a.created_at) - new Date(b.created_at)
   );
-  
+
   const grouped = {};
-  
+  const daysOfWeek = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+
   events.forEach((event) => {
     let key;
     let sortKey; // Clé numérique pour le tri
     const date = new Date(event.created_at);
-    
+
     if (scale === "hour") {
       const hours = date.getHours();
       key = String(hours).padStart(2, "0") + ":00";
       sortKey = hours;
     } else if (scale === "day") {
-      key = date.toISOString().slice(0, 10);
-      sortKey = date.getTime();
-    } else if (scale === "week") {
-      // ISO week number
-      const d = new Date(date.getTime());
-      d.setHours(0, 0, 0, 0);
-      d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-      const yearStart = new Date(d.getFullYear(), 0, 1);
-      const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-      key = `${d.getFullYear()}-S${weekNo}`;
-      sortKey = d.getTime();
+      const dayOfWeek = date.getDay();
+      key = daysOfWeek[dayOfWeek];
+      sortKey = dayOfWeek;
     } else if (scale === "month") {
       key =
         date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
       sortKey = date.getFullYear() * 12 + date.getMonth();
     }
-    
+
     if (!grouped[key]) {
       grouped[key] = {
         count: 0,
@@ -67,7 +59,7 @@ function groupEvents(events, scale) {
         sortKey,
       };
     }
-    
+
     grouped[key].count++;
     if (event.event_type === "entree")
       grouped[key].entree = (grouped[key].entree || 0) + 1;
@@ -77,7 +69,7 @@ function groupEvents(events, scale) {
       grouped[key].rien = (grouped[key].rien || 0) + 1;
     grouped[key].confidence += event.confidence;
   });
-  
+
   // Trier par sortKey (numérique) et convertir en array
   return Object.values(grouped)
     .sort((a, b) => a.sortKey - b.sortKey)
@@ -124,6 +116,10 @@ const MyGraph = ({ dataProps }) => {
               <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8} />
               <stop offset="95%" stopColor="#2563eb" stopOpacity={0.1} />
             </linearGradient>
+            <linearGradient id="colorSortie" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1} />
+            </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="key" tick={{ fontSize: 13, fill: "#fff" }} />
@@ -138,6 +134,16 @@ const MyGraph = ({ dataProps }) => {
             fill="url(#colorEntree)"
             name="Entrée"
           />
+          {scale === "hour" && (
+            <Area
+              type="monotone"
+              dataKey="sortie"
+              stroke="#ef4444"
+              fillOpacity={1}
+              fill="url(#colorSortie)"
+              name="Sortie"
+            />
+          )}
         </AreaChart>
       </ResponsiveContainer>
       <div className="mt-6">

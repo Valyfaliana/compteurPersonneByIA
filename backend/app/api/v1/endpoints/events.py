@@ -20,7 +20,7 @@ def create_event(
 
 @router.get("/", response_model=list[event_schemas.EventOut])
 def read_events(
-    skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)
+    skip: int = 0, limit: int = 10000, db: Session = Depends(database.get_db)
 ):
     return event_crud.get_events(db, skip=skip, limit=limit)
 

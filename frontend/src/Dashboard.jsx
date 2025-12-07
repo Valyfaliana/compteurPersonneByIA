@@ -29,7 +29,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     apiGetEvents()
-      .then(res => setHistorique(res.data))
+      .then(res => {
+        setHistorique(res.data);
+        console.log("Events data : ", res.data);
+        
+      })
       .catch(err => console.error("Erreur recuperation historique : ", err));
   }, []);
 
@@ -124,7 +128,7 @@ const PartieTempsReel = () => {
       <div className="flex flex-wrap justify-evenly w-full flex-row">
         {/* Etat des capteurs break beam */}
         <MyCard
-          title="Capteur Break Beam"
+          title="Capteurs Break Beam"
           className="w-full md:w-1/4 mb-4 md:mb-0"
         >
           <div className="flex flex-wrap justify-around content-center h-full">
@@ -135,14 +139,14 @@ const PartieTempsReel = () => {
 
         {/* Etat capteur PIR */}
         <MyCard
-          title="Capteur PIRs"
+          title="Capteurs PIR"
           className={`w-full md:w-1/4 mb-4 md:mb-0 transition-colors duration-500 ${
             etatPir &&
             "bg-linear-to-br from-blue-400/70 via-blue-500/70 to-blue-700/70"
           }`}
         >
           <span className="text-6xl font-semibold italic flex flex-wrap content-center h-full">
-            {etatPir ? "Mouvement" : "Rien"}
+            {etatPir ? "Presence" : "Rien"}
           </span>
         </MyCard>
 
