@@ -119,24 +119,28 @@ const PartieTempsReel = () => {
   }, []);
 
   useEffect(() => {
-    const prevPeople = prevPeopleRef.current;
-    const currentPeople = Number(people);
+    const interval = setInterval(() => {
+      const prevPeople = prevPeopleRef.current;
+      const currentPeople = Number(people);
 
-    if (currentPeople > prevPeople) {
-      setProbaEntree(Math.random() * (1 - 0.85) + 0.85);
-      setProbaSortie(0.07);
-      setProbaRien(0.05);
-    } else if (currentPeople < prevPeople) {
-      setProbaEntree(0.05);
-      setProbaSortie(Math.random() * (1 - 0.85) + 0.85);
-      setProbaRien(0.92);
-    } else {
-      setProbaEntree(0.1);
-      setProbaSortie(0.08);
-      setProbaRien(Math.random() * (1 - 0.85) + 0.85);
-    }
+      if (currentPeople > prevPeople) {
+        setProbaEntree(Math.random() * (1 - 0.85) + 0.85);
+        setProbaSortie(0.07);
+        setProbaRien(0.05);
+      } else if (currentPeople < prevPeople) {
+        setProbaEntree(0.05);
+        setProbaSortie(Math.random() * (1 - 0.85) + 0.85);
+        setProbaRien(0.04);
+      } else {
+        setProbaEntree(0.1);
+        setProbaSortie(0.08);
+        setProbaRien(Math.random() * (1 - 0.85) + 0.85);
+      }
 
-    prevPeopleRef.current = people;
+      prevPeopleRef.current = people;
+    }, 50);
+
+    return () => clearInterval(interval);
   }, [people]);
 
   return (
